@@ -1,0 +1,402 @@
+:root {
+  --cream: #f4ecdc;
+  --cream-veil: rgba(244, 236, 220, 0.86);
+  --ink: #1f2430;
+  --ink-soft: rgba(31, 36, 48, 0.62);
+  --sea: #2f6f7a;
+  --serif: 'Bodoni Moda', Didot, serif;
+  --sans: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --gutter: clamp(16px, 4vw, 48px);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--sea);
+  outline-offset: 4px;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* One route segment = 120vh of scroll; the last stop only needs to be reached. */
+.track { height: calc(120vh * 6 + 100vh); }
+
+/* ---------- Header ---------- */
+
+.hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 20px var(--gutter);
+}
+
+.hud__brand {
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.hud__brand em,
+.loader__mark em { color: var(--sea); }
+
+.hud__tools {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.hud__backend { font-size: 0.75rem; color: var(--ink-soft); }
+
+.hud__sound {
+  background: none;
+  border: 1px solid rgba(31, 36, 48, 0.25);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.hud__sound:hover { border-color: var(--ink); }
+.hud__sound[aria-pressed='true'] { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+
+/* ---------- Stop title ---------- */
+
+.stage {
+  position: fixed;
+  top: 14vh;
+  left: clamp(16px, 6vw, 96px);
+  right: var(--gutter);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.stage__title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(3rem, 9vw, 8.5rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin: 0;
+  overflow: hidden;
+  padding-bottom: 0.08em; /* keeps descenders inside the clipping box */
+}
+
+.stage__title span { display: inline-block; }
+
+.stage__lead {
+  margin: 1rem 0 0;
+  font-size: 1rem;
+  color: var(--ink-soft);
+}
+
+/* ---------- Point-of-interest marker ---------- */
+
+.marker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -14px 0 0 -14px; /* centre the dot on the projected point */
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+
+.marker.is-visible { opacity: 1; pointer-events: auto; }
+
+.marker__dot {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--cream);
+  box-shadow: 0 0 0 1px rgba(31, 36, 48, 0.2);
+}
+
+.marker__dot::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.marker__dot::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  border: 1px solid var(--cream);
+  animation: marker-pulse 2.4s ease-out infinite;
+}
+
+@keyframes marker-pulse {
+  from { transform: scale(1); opacity: 0.9; }
+  to { transform: scale(2.2); opacity: 0; }
+}
+
+.marker__label {
+  background: var(--cream-veil);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.marker:hover .marker__label { background: var(--cream); }
+.marker:focus-visible { outline-offset: 6px; border-radius: 999px; }
+
+/* ---------- How-it's-made sheet ---------- */
+
+.sheet {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto 16px auto auto;
+  padding: 32px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--cream);
+  color: var(--ink);
+  overflow: auto;
+}
+
+.sheet::backdrop { background: rgba(31, 36, 48, 0.28); }
+
+.sheet[open] { animation: sheet-in 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+
+@keyframes sheet-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.sheet__close-form { display: flex; justify-content: flex-end; margin: -8px -8px 8px 0; }
+
+.sheet__close {
+  background: none;
+  border: 0;
+  padding: 8px;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.sheet__title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  line-height: 1;
+  margin: 0 0 1.25rem;
+}
+
+.sheet__body p {
+  margin: 0 0 1rem;
+  line-height: 1.6;
+  max-width: 62ch;
+}
+
+.sheet__facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin: 1.5rem 0 0;
+  background: rgba(31, 36, 48, 0.15);
+  border: 1px solid rgba(31, 36, 48, 0.15);
+}
+
+.sheet__facts div { background: var(--cream); padding: 14px 16px; }
+.sheet__facts dt { font-size: 0.8rem; color: var(--ink-soft); }
+
+.sheet__facts dd {
+  margin: 4px 0 0;
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sheet__note { margin: 1rem 0 0; font-size: 0.8rem; color: var(--ink-soft); }
+
+/* ---------- Step list ---------- */
+
+.stops {
+  position: fixed;
+  left: var(--gutter);
+  bottom: 40px;
+  z-index: 2;
+}
+
+/* A light veil keeps the list readable over dark terrain. */
+.stops ol {
+  display: flex;
+  gap: 2px;
+  margin: 0;
+  padding: 3px;
+  list-style: none;
+  background: var(--cream-veil);
+  border-radius: 999px;
+}
+
+.stops__button {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 6px 10px;
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.stops__button:hover { color: var(--ink); }
+
+.stops__button[aria-current='step'] {
+  color: var(--cream);
+  background: var(--ink);
+}
+
+.stops__number { font-variant-numeric: tabular-nums; }
+
+/* ---------- Progress ---------- */
+
+.progress {
+  position: fixed;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 24px;
+  height: 1px;
+  background: rgba(31, 36, 48, 0.15);
+  z-index: 2;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--ink);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+/* ---------- Loader ---------- */
+
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: inset(0 0 0 0);
+}
+
+.loader.is-done { visibility: hidden; pointer-events: none; }
+
+.loader__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: min(240px, 60vw);
+}
+
+.loader__mark { font-family: var(--serif); font-size: 3rem; }
+
+.loader__track {
+  width: 100%;
+  height: 1px;
+  background: rgba(31, 36, 48, 0.15);
+}
+
+.loader__bar {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+.loader__step { font-size: 0.85rem; color: var(--ink-soft); }
+
+/* ---------- Fallback ---------- */
+
+.fallback {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: var(--cream);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 16px;
+}
+
+.fallback[hidden] { display: none; }
+.fallback a { color: var(--sea); }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Small screens ---------- */
+
+@media (max-width: 640px) {
+  .hud__backend { display: none; }
+  .stage { top: 12vh; }
+  .sheet { margin: auto auto 0; width: 100vw; max-height: 85dvh; border-radius: 12px 12px 0 0; padding: 24px 16px; }
+  .sheet__facts { grid-template-columns: 1fr; }
+  .marker__label { display: none; }
+  .stops__name { display: none; }
+  .stops__button { min-width: 40px; min-height: 40px; justify-content: center; align-items: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marker__dot::after { animation: none; }
+  .sheet[open] { animation: none; }
+  .marker { transition: none; }
+}

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KEYS Lab</title>
+    <meta name="description" content="Le laboratoire de KEYS Performance : une île méditerranéenne générée et rendue en temps réel dans le navigateur." />
+    <meta name="theme-color" content="#f4ecdc" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="KEYS Lab" />
+    <meta property="og:description" content="Une île méditerranéenne générée et rendue en temps réel dans le navigateur, de la mer au soir." />
+    <meta property="og:locale" content="fr_FR" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;1,6..96,400&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <canvas id="scene" aria-hidden="true"></canvas>
+
+    <p class="sr-only">
+      Expérience visuelle en trois dimensions : une île méditerranéenne générée par le code, que l’on parcourt en
+      faisant défiler la page, du large jusqu’au soir. Chaque étape propose une fiche qui explique comment elle est faite.
+      La liste des étapes, plus bas, permet d’y accéder directement.
+    </p>
+
+    <div class="loader" id="loader" role="status" aria-live="polite">
+      <div class="loader__inner">
+        <span class="loader__mark">keys. <em>lab</em></span>
+        <span class="loader__track"><span class="loader__bar" id="loader-bar"></span></span>
+        <span class="loader__step" id="loader-step">Préparation</span>
+      </div>
+    </div>
+
+    <header class="hud">
+      <a class="hud__brand" href="https://keysperformance.com/">keys. <em>lab</em></a>
+      <div class="hud__tools">
+        <span class="hud__backend" id="backend"></span>
+        <button class="hud__sound" id="sound" type="button" aria-pressed="false">Activer le son</button>
+      </div>
+    </header>
+
+    <div class="stage" aria-live="polite">
+      <h1 class="stage__title" id="stage-title"></h1>
+      <p class="stage__lead" id="stage-lead"></p>
+    </div>
+
+    <button class="marker" id="marker" type="button" tabindex="-1" aria-hidden="true">
+      <span class="marker__dot" aria-hidden="true"></span>
+      <span class="marker__label">Comment c’est fait</span>
+    </button>
+
+    <dialog class="sheet" id="sheet" aria-labelledby="sheet-title">
+      <form method="dialog" class="sheet__close-form">
+        <button class="sheet__close" type="submit">Fermer</button>
+      </form>
+      <h2 class="sheet__title" id="sheet-title"></h2>
+      <div class="sheet__body" id="sheet-body"></div>
+      <dl class="sheet__facts" id="sheet-facts"></dl>
+      <p class="sheet__note">Les valeurs dynamiques sont mesurées en direct sur votre appareil.</p>
+    </dialog>
+
+    <!-- Scroll distance only: the route is driven by how far this is scrolled. -->
+    <div class="track" aria-hidden="true"></div>
+
+    <nav class="stops" aria-label="Étapes du parcours"><ol id="stops"></ol></nav>
+
+    <div class="progress" aria-hidden="true"><span id="progress"></span></div>
+
+    <div class="fallback" id="fallback" hidden>
+      <p>Votre navigateur ne prend pas en charge le rendu 3D nécessaire à cette expérience.</p>
+      <a href="https://keysperformance.com/">Retour à keysperformance.com</a>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
